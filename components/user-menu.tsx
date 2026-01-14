@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase-client";
+import type { User } from "@supabase/supabase-js";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,11 +14,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Settings } from "lucide-react";
+import { User as UserIcon, LogOut, Settings } from "lucide-react";
 
 export function UserMenu() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -49,11 +50,11 @@ export function UserMenu() {
     };
   }, [router]);
 
-const handleSignOut = async () => {
-  await supabase.auth.signOut();
-  router.refresh(); // clears server cache
-  router.push("/auth");
-};
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.refresh(); // clears server cache
+    router.push("/auth");
+  };
 
 
   if (loading) {
@@ -103,7 +104,7 @@ const handleSignOut = async () => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => router.push("/auth")}>
-          <User className="mr-2 h-4 w-4" />
+          <UserIcon className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
         <DropdownMenuItem disabled>

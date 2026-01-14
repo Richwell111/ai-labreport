@@ -74,12 +74,17 @@ Now provide a safe, clear, informational answer.
       success: true,
       answer,
     });
-  } catch (error: any) {
-    console.error("General chat error:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("General chat error:", error.message);
+    } else {
+      console.error("General chat error: Unknown error", error);
+    }
     return NextResponse.json(
       {
         error: "Failed to generate response",
-        details: error.message || String(error),
+        details:
+          error instanceof Error ? error.message : "Unknown generation error",
       },
       { status: 500 }
     );

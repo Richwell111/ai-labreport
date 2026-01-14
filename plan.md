@@ -1,0 +1,7 @@
+Plan:
+1) API auth + Scalekit: replace `any` with typed or `unknown`+narrowing in [app/api/auth/scalekit/authorize/route.ts](app/api/auth/scalekit/authorize/route.ts), [app/api/auth/scalekit/callback/route.ts](app/api/auth/scalekit/callback/route.ts), [app/api/scalekit/gmail/route.ts](app/api/scalekit/gmail/route.ts); keep logic unchanged.
+2) Lab API routes: add lightweight request/response shapes and remove `any` in [app/api/lab/analyze/route.ts](app/api/lab/analyze/route.ts), [app/api/lab/chat/general/route.ts](app/api/lab/chat/general/route.ts), [app/api/lab/chat/route.ts](app/api/lab/chat/route.ts), [app/api/lab/reports/route.ts](app/api/lab/reports/route.ts), [app/api/lab/upload/route.ts](app/api/lab/upload/route.ts).
+3) Libraries: type outputs in [lib/scalekit-connectors.ts](lib/scalekit-connectors.ts) (and related) with minimal safe interfaces; use `unknown` + narrowing where SDK types are absent.
+4) Components/pages: replace `any` props/state with minimal types and clean truly unused vars/imports in [components/*](components/*), [app/auth/page.tsx](app/auth/page.tsx), [app/chatbot/page.tsx](app/chatbot/page.tsx), [app/notes/page.tsx](app/notes/page.tsx), [app/page.tsx](app/page.tsx).
+5) Config fallback: only if needed, adjust `.eslintrc.json` to relax `@typescript-eslint/no-explicit-any`; keep `no-unused-vars` as warning.
+6) Verify: run ESLint/`next build` to ensure no blocking errors.

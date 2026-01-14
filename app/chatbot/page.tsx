@@ -103,8 +103,8 @@ export default function ChatbotPage() {
       };
 
       setMessages((prev) => [...prev, aiMessage]);
-    } catch (err: any) {
-      setError(err.message || "Failed to send message");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to send message");
       // Remove the user message if it failed
       setMessages((prev) => prev.slice(0, -1));
     } finally {
@@ -134,6 +134,11 @@ export default function ChatbotPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex-1 flex flex-col p-0">
+          {error && (
+            <p className="px-6 py-2 text-sm text-red-600" role="alert">
+              {error}
+            </p>
+          )}
           <ScrollArea className="flex-1 p-6">
             <div className="space-y-4">
               {messages.map((message) => (

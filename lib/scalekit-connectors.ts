@@ -41,21 +41,34 @@ export function getConnectorAuthUrl(options: {
 /**
  * Handle connector OAuth callback
  */
+type AuthUser = {
+  id?: string;
+  userId?: string;
+  email: string;
+  name: string;
+};
+
+type AuthResult = {
+  user: AuthUser;
+  organizationId?: string;
+  organization_id?: string;
+};
+
 export async function handleConnectorCallback(
   code: string,
   redirectUri: string
-) {
+): Promise<{ user: { id: string; email: string; name: string }; organizationId?: string }> {
   const sc = getClient();
-  const result = await sc.authenticateWithCode(code, redirectUri);
+  const result = (await sc.authenticateWithCode(code, redirectUri)) as AuthResult;
 
   return {
     user: {
-      id: (result.user as any).id || (result.user as any).userId || "",
+      id: result.user.id || result.user.userId || "",
       email: result.user.email,
       name: result.user.name,
     },
     organizationId:
-      (result as any).organizationId || (result as any).organization_id,
+      result.organizationId || result.organization_id,
   };
 }
 

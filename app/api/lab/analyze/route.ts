@@ -15,12 +15,17 @@ export async function POST(req: NextRequest) {
     const analysis = await analyzeLabReportText(text);
 
     return NextResponse.json({ success: true, analysis });
-  } catch (error: any) {
-    console.error("Gemini analysis error:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Gemini analysis error:", error.message);
+    } else {
+      console.error("Gemini analysis error: Unknown error", error);
+    }
     return NextResponse.json(
       {
         error: "Failed to analyze lab report",
-        details: error.message || String(error),
+        details:
+          error instanceof Error ? error.message : "Unknown analysis error",
       },
       { status: 500 }
     );

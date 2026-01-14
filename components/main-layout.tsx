@@ -5,7 +5,6 @@ import Link from "next/link"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
-import { Logo } from "@/components/logo"
 import { UserMenu } from "@/components/user-menu"
 
 export function MainLayout({ children }: { children: React.ReactNode }) {

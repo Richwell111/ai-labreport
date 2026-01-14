@@ -38,7 +38,7 @@ interface EmailResult {
 export function GmailConnector() {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [emails, setEmails] = useState<EmailResult[]>([]);
+  const [emails] = useState<EmailResult[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleConnect = async () => {

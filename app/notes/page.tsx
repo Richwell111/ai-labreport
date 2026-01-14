@@ -3,13 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase-client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,7 +34,6 @@ import {
   Trash2,
   MoreVertical,
   Loader2,
-  X,
   AlertCircle,
 } from "lucide-react";
 
@@ -51,6 +44,14 @@ interface Note {
   date: string;
   tags: string[];
   encrypted: boolean;
+}
+
+interface NoteRow {
+  id: string;
+  title: string;
+  content: string;
+  created_at: string | null;
+  tags: string[] | string | null;
 }
 
 export default function NotesPage() {
@@ -110,22 +111,29 @@ export default function NotesPage() {
           }
         } else {
           console.log("Loaded notes:", data?.length || 0);
-          const mapped: Note[] = (data || []).map((row: any) => ({
+        const mapped: Note[] = (data || []).map((row: NoteRow) => {
+          const tagsArray =
+            Array.isArray(row.tags) && row.tags.length > 0
+              ? row.tags
+              : typeof row.tags === "string" && row.tags.length
+              ? row.tags.split(",").map((t) => t.trim())
+              : [];
+          return {
             id: row.id,
             title: row.title,
             content: row.content,
             date: row.created_at?.slice(0, 10) ?? "",
-            tags: Array.isArray(row.tags)
-              ? row.tags
-              : typeof row.tags === "string" && row.tags.length
-              ? row.tags.split(",").map((t: string) => t.trim())
-              : [],
+            tags: tagsArray,
             encrypted: true,
-          }));
+          };
+        });
           setNotes(mapped);
         }
-      } catch (err) {
-        console.error("Unexpected error loading notes:", err);
+      } catch (err: unknown) {
+        console.error(
+          "Unexpected error loading notes:",
+          err instanceof Error ? err.message : err
+        );
       } finally {
         setLoading(false);
       }
@@ -223,9 +231,13 @@ export default function NotesPage() {
       setNewNote({ title: "", content: "", tags: "" });
       setIsDialogOpen(false);
       console.log("Note created successfully:", note);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to create note:", err);
-      alert(err.message || "Failed to create note. Check console for details.");
+      alert(
+        err instanceof Error
+          ? err.message
+          : "Failed to create note. Check console for details."
+      );
     } finally {
       setSaving(false);
     }
@@ -287,7 +299,7 @@ export default function NotesPage() {
       setEditingNote(null);
       setNewNote({ title: "", content: "", tags: "" });
       setIsEditDialogOpen(false);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Failed to update note:", err);
       alert("Failed to update note. Check console for details.");
     } finally {
@@ -317,7 +329,7 @@ export default function NotesPage() {
       if (error) throw error;
 
       setNotes((prev) => prev.filter((n) => n.id !== noteId));
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Failed to delete note:", err);
       alert("Failed to delete note. Check console for details.");
     } finally {

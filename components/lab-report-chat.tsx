@@ -91,8 +91,8 @@ export function LabReportChat({ reportId, fileName }: LabReportChatProps) {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
-    } catch (err: any) {
-      setError(err.message || "Failed to send message");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to send message");
       // Remove the user message if it failed
       setMessages((prev) => prev.slice(0, -1));
     } finally {

@@ -87,12 +87,16 @@ export async function GET(req: NextRequest) {
       success: true,
       labReports: labReports || [],
     });
-  } catch (error: any) {
-    console.error("Fetch error:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Fetch error:", error.message);
+    } else {
+      console.error("Fetch error: Unknown error", error);
+    }
     return NextResponse.json(
       {
         error: "Failed to fetch lab reports",
-        details: error.message || String(error),
+        details: error instanceof Error ? error.message : undefined,
       },
       { status: 500 }
     );
@@ -182,12 +186,16 @@ export async function DELETE(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error("Delete error:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Delete error:", error.message);
+    } else {
+      console.error("Delete error: Unknown error", error);
+    }
     return NextResponse.json(
       {
         error: "Failed to delete lab report",
-        details: error.message || String(error),
+        details: error instanceof Error ? error.message : undefined,
       },
       { status: 500 }
     );

@@ -117,12 +117,16 @@ export async function POST(req: NextRequest) {
     try {
       answer = await chatWithLabReport(rawText, aiAnalysis, question);
       console.log("Chat response generated, length:", answer.length);
-    } catch (error: any) {
-      console.error("Chat error:", error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Chat error:", error.message);
+      } else {
+        console.error("Chat error: Unknown error", error);
+      }
       return NextResponse.json(
         {
           error: "Failed to get answer from AI",
-          details: error.message || String(error),
+          details: error instanceof Error ? error.message : undefined,
         },
         { status: 500 }
       );
@@ -132,12 +136,16 @@ export async function POST(req: NextRequest) {
       success: true,
       answer,
     });
-  } catch (error: any) {
-    console.error("Chat API error:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Chat API error:", error.message);
+    } else {
+      console.error("Chat API error: Unknown error", error);
+    }
     return NextResponse.json(
       {
         error: "Failed to process chat request",
-        details: error.message || String(error),
+        details: error instanceof Error ? error.message : undefined,
       },
       { status: 500 }
     );

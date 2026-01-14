@@ -98,8 +98,12 @@ export async function POST(req: NextRequest) {
         fileName || file.name
       );
       console.log(`Generated AI analysis (${aiAnalysis.length} characters)`);
-    } catch (error: any) {
-      console.error("AI analysis failed:", error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("AI analysis failed:", error.message);
+      } else {
+        console.error("AI analysis failed: Unknown error", error);
+      }
       // Continue even if analysis fails - we'll store the report with raw text
     }
 
@@ -136,12 +140,16 @@ export async function POST(req: NextRequest) {
         rawTextLength: 0,
       },
     });
-  } catch (error: any) {
-    console.error("Upload error:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Upload error:", error.message);
+    } else {
+      console.error("Upload error: Unknown error", error);
+    }
     return NextResponse.json(
       {
         error: "Failed to process lab report",
-        details: error.message || String(error),
+        details: error instanceof Error ? error.message : undefined,
       },
       { status: 500 }
     );

@@ -46,11 +46,15 @@ export async function GET(request: NextRequest) {
     const redirectUri = `${request.nextUrl.origin}/api/auth/scalekit/callback`;
     const result = await scalekit.authenticateWithCode(code, redirectUri);
 
+    const organizationId =
+      (result as { organizationId?: string; organization_id?: string })
+        .organizationId ||
+      (result as { organization_id?: string }).organization_id;
+
     console.log("Scalekit auth result:", {
       email: result.user.email,
       name: result.user.name,
-      organizationId:
-        (result as any).organizationId || (result as any).organization_id,
+      organizationId,
     });
 
     // Create or update user in Supabase
@@ -63,11 +67,7 @@ export async function GET(request: NextRequest) {
       .eq("email", result.user.email)
       .single();
 
-    let userId: string;
-
-    if (existingUser) {
-      userId = existingUser.id;
-    } else {
+    if (!existingUser) {
       // Create new user
       const { data: newUser, error: createError } =
         await supabase.auth.admin.createUser({
@@ -75,8 +75,7 @@ export async function GET(request: NextRequest) {
           email_confirm: true,
           user_metadata: {
             full_name: result.user.name,
-            organization_id:
-              (result as any).organizationId || (result as any).organization_id,
+            organization_id: organizationId,
             sso_provider: "scalekit",
           },
         });
@@ -88,7 +87,6 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      userId = newUser.user.id;
     }
 
     // Create a session for the user
@@ -121,12 +119,16 @@ export async function GET(request: NextRequest) {
     );
 
     return response;
-  } catch (error: any) {
-    console.error("Scalekit callback error:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Scalekit callback error:", error.message);
+    } else {
+      console.error("Scalekit callback error: Unknown error", error);
+    }
     return NextResponse.redirect(
       new URL(
         `/auth?error=${encodeURIComponent(
-          error.message || "Authentication failed"
+          error instanceof Error ? error.message : "Authentication failed"
         )}`,
         request.url
       )

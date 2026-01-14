@@ -37,11 +37,18 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, data });
-  } catch (error: any) {
-    console.error("Scalekit API error:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Scalekit API error:", error.message);
+    } else {
+      console.error("Scalekit API error: Unknown error", error);
+    }
     return NextResponse.json(
       {
-        error: error.message || "Failed to get Scalekit authorization URL",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to get Scalekit authorization URL",
       },
       { status: 500 }
     );

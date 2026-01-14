@@ -3,13 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  FileText,
-  MessageSquare,
-  StickyNote,
-  LayoutDashboard,
-  LogIn,
-} from "lucide-react";
+import { FileText, MessageSquare, StickyNote, LayoutDashboard } from "lucide-react";
 
 import {
   Sidebar,
@@ -22,8 +16,6 @@ import {
   SidebarMenuItem,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { Logo } from "@/components/logo";
-
 const menuItems = [
   {
     title: "Dashboard",

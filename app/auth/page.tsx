@@ -23,23 +23,23 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-   const handleSignIn = async () => {
-     if (!supabase) return;
-     setLoading(true);
-     setError(null);
-     try {
-       const { error } = await supabase.auth.signInWithPassword({
-         email,
-         password,
-       });
-       if (error) throw error;
-       router.push("/");
-     } catch (err: any) {
-       setError(err.message || "Sign in failed");
-     } finally {
-       setLoading(false);
-     }
-   };
+  const handleSignIn = async () => {
+    if (!supabase) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      router.push("/");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Sign in failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSignUp = () => {
     if (!email || !password) {
@@ -51,16 +51,18 @@ export default function AuthPage() {
     setTimeout(() => {
       setUserEmail(email);
       setLoading(false);
-      alert("Account created! (This is a demo - no actual account was created)");
+      alert(
+        "Account created! (This is a demo - no actual account was created)"
+      );
       router.push("/");
     }, 500);
   };
 
-   const handleSignOut = async () => {
-     if (!supabase) return;
-     await supabase.auth.signOut();
-     setUserEmail(null);
-   };
+  const handleSignOut = async () => {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    setUserEmail(null);
+  };
 
   const handleGmailSignIn = async () => {
     if (!supabase) return;
@@ -79,8 +81,8 @@ export default function AuthPage() {
         },
       });
       if (error) throw error;
-    } catch (err: any) {
-      setError(err.message || "Gmail sign in failed");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Gmail sign in failed");
       setLoading(false);
     }
   };
@@ -110,6 +112,11 @@ export default function AuthPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {error && (
+            <p className="text-sm text-red-600" role="alert">
+              {error}
+            </p>
+          )}
           {userEmail ? (
             <div className="space-y-4">
               <div className="space-y-2 text-sm">

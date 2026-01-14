@@ -39,10 +39,19 @@ export async function POST(request: NextRequest) {
       success: true,
       authorizationUrl: authUrl,
     });
-  } catch (error: any) {
-    console.error("Scalekit authorize error:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Scalekit authorize error:", error.message);
+    } else {
+      console.error("Scalekit authorize error: Unknown error", error);
+    }
     return NextResponse.json(
-      { error: error.message || "Failed to generate authorization URL" },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to generate authorization URL",
+      },
       { status: 500 }
     );
   }
